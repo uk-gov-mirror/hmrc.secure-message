@@ -576,24 +576,22 @@ class SecureMessageUtilSpec extends PlaySpec with ScalaFutures with MockitoSugar
 
   "cleanUpSubjectAndBody" must {
     "clean up subject successfully" in {
-      val dirtySubject = "Clean <b>Subject</b>"
+      val dirtySubject = "Clean <b><unexpected>Subject</unexpected></b>"
       val body = "<p>Test Body</p>"
       val content = Content(Language.English, dirtySubject, body)
 
       val result = testUtil.cleanUpSubjectAndBody(content)
-      result.subject must not be empty
-      result.subject must include("Clean")
-      result.subject must include("Subject")
+      result.subject mustBe "Clean <b>Subject</b>"
     }
 
     "clean up body successfully with allowed tags" in {
       val subject = "Test Subject"
-      val dirtyBody = "<details><summary>Summary</summary><p>Content</p></details>"
+      val dirtyBody = """<details><summary><section lang="en">Summary</summary><p>Content</p></details>"""
       val content = Content(Language.English, subject, dirtyBody)
 
       val result = testUtil.cleanUpSubjectAndBody(content)
-      result.body must include("details")
-      result.body must include("summary")
+
+      result.body mustBe "<details><summary><section>Summary</section></summary><p>Content</p></details>"
     }
 
     "remove script tags from subject" in {
@@ -602,7 +600,7 @@ class SecureMessageUtilSpec extends PlaySpec with ScalaFutures with MockitoSugar
       val content = Content(Language.English, dirtySubject, body)
 
       val result = testUtil.cleanUpSubjectAndBody(content)
-      result.subject must not include "<script>"
+      result.subject mustBe "Subject "
     }
 
     "throw exception when subject cleaning fails" in {

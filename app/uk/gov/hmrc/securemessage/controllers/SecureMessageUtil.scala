@@ -244,7 +244,7 @@ class SecureMessageUtil @Inject() (
           List(
             AllowedTagAndAttributes("details"),
             AllowedTagAndAttributes("summary"),
-            AllowedTagAndAttributes("section", List("lang"))
+            AllowedTagAndAttributes("section")
           )
         ) match {
           case Success(cleanContent) =>
